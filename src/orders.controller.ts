@@ -18,19 +18,29 @@ interface Order {
 const database: Map<string, Order> = new Map();
 
 export default class OrdersController {
-  calculateLineTotal(items) {
-    return items.reduce((total, line) => {
-      total = line.PricePerItem * line.Quantity + total;
-    }, 0);
+  fixTotalPrice(items) {
+    return items.map((item) => ({
+      ...item,
+      TotalPrice: item.PricePerItem * item.Quantity,
+    }));
+  }
+
+  calculateTotal(items) {
+    return items
+      .map((line) => line.TotalPrice)
+      .reduce((grandTotal, total) => grandTotal + total, 0);
   }
 
   update = (req, res, next) => {
     try {
       let order: Order;
+
+      req.body.OrderLines = this.fixTotalPrice(req.body.OrderLines);
+
       if (!database.has(req.params.orderId)) {
         order = {
           OrderId: req.params.orderId,
-          TotalPrice: this.calculateLineTotal(req.body.OrderLines),
+          TotalPrice: this.calculateTotal(req.body.OrderLines),
           OrderLines: req.body.OrderLines || [],
         };
         database.set(req.params.orderId, order);
@@ -46,7 +56,7 @@ export default class OrdersController {
       const nextOrder: Order = {
         ...order,
         OrderId: req.params.orderId,
-        TotalPrice: this.calculateLineTotal(nextOrderLines),
+        TotalPrice: this.calculateTotal(req.body.OrderLines),
         OrderLines: nextOrderLines,
       };
 

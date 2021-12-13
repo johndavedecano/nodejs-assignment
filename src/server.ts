@@ -7,6 +7,8 @@ const orders = new OrdersController();
 
 const app = express()
 
+app.use(express.json())
+
 app.get('/', (_req, res) => res.send('ok'))
 
 app.use('/orders', auth, orders.routes);

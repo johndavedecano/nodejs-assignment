@@ -11,7 +11,7 @@ const validate = (validations) => {
     }
 
     return res
-      .status(402)
+      .status(422)
       .json({ errors: errors.array(), message: 'validation error' });
   };
 };
