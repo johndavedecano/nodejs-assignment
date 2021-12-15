@@ -6,14 +6,14 @@ describe('orders.controller', () => {
   it('should return 401 unuathorized access', async () => {
     process.env.API_KEY = 'test';
     const request = supertest(app);
-    const response = await request.put('/orders/1');
+    const response = await request.post('/orders/1');
     expect(response.status).toBe(401);
   });
 
   it('should return 422 validation error', async () => {
     process.env.API_KEY = 'test';
     const request = supertest(app);
-    const response = await request.put('/orders/1').set('x-api-key', 'test');
+    const response = await request.post('/orders/1').set('x-api-key', 'test');
     expect(response.status).toBe(422);
   });
 
@@ -21,7 +21,7 @@ describe('orders.controller', () => {
     process.env.API_KEY = 'test';
     const request = supertest(app);
     const response = await request
-      .put('/orders/1')
+      .post('/orders/1')
       .set('x-api-key', 'test')
       .send({
         OrderId: '1',
